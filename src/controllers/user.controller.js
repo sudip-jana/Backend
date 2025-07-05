@@ -28,6 +28,7 @@ const registerUser = asyncHandler( async(req, res) =>{
         throw new ApiError(400, "All fields are required")
     }
 
+    // findOne is a mongoose query and $or is a mongodb operator
     const existedUser = await User.findOne({
         $or: [{username}, {email}]
     })
@@ -51,7 +52,8 @@ const registerUser = asyncHandler( async(req, res) =>{
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    // if in coverImagePath nothing is passed then cloudinary would return empty string
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath) 
 
     if(!avatar){
         throw new ApiError(400, "Avatar file is required")
@@ -66,6 +68,7 @@ const registerUser = asyncHandler( async(req, res) =>{
         username: username.toLowerCase()
     })
 
+    // user._id -> mongodb generates unique id for User created and here we checking all the fields excepts passwd , refreshToken
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
